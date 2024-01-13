@@ -56,13 +56,14 @@ def attention_erase_map(images, outputs, gmmweight, target_mask):
     for i in range(img.size(0)):
         for attempt in range(1000000000):
             area = img.size()[2] * img.size()[3]
-            target_area =  random.uniform(sl, sh) *area + 0.1 * (1-gmmweight[i])
+            target_area_ratio =  random.uniform(sl, sh) + 0.05 * (1-gmmweight[i])
+            target_area = target_area_ratio*area
             maxindex = torch.argmax(target_mask[i])
             flagmask = torch.zeros(target_mask[i].shape)
             flagmask[maxindex] = 1
             flagmask = flagmask.bool()
-            target_mask[i][flagmask] -= target_area
-            target_mask[i][~flagmask] += target_area/(target_mask[i].shape[-1]-1)
+            target_mask[i][flagmask] -= target_area_ratio
+            target_mask[i][~flagmask] += target_area_ratio/(target_mask[i].shape[-1]-1)
             aspect_ratio = random.uniform(r1, 1 / r1)
             h = int(round(math.sqrt(target_area*0.5 * aspect_ratio)))
             w = int(round(math.sqrt(target_area*0.5 / aspect_ratio)))
