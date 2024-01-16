@@ -3,7 +3,7 @@ Source code for our CVPR paper Learning with Noisy labels via Self-supervised Ad
 
 # Learning with Noisy labels via Self-supervised Adversarial Noisy Masking (CVPR 2023) 
 
-This is the pytorch implementation of the [paper](https://openaccess.thecvf.com/content/CVPR2023/papers/Tu_Learning_From_Noisy_Labels_With_Decoupled_Meta_Label_Purifier_CVPR_2023_paper.pdf) (accepted by CVPR 2023).
+This is the pytorch implementation of the [paper](https://openaccess.thecvf.com/content/CVPR2023/papers/Tu_Learning_With_Noisy_Labels_via_Self-Supervised_Adversarial_Noisy_Masking_CVPR_2023_paper.pdf) (accepted by CVPR 2023).
 
 <img src='SANM.png'>
 
