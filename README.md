@@ -10,7 +10,7 @@ This is the pytorch implementation of the [paper](https://openaccess.thecvf.com/
 **Fig 1**.SANM framework
 
 # Training
-First you need to install dependencies by running pip install -r requirements.txt.
+First you need to install dependencies by running `pip install -r requirements.txt`.
 
 Then, please create a folder named <i>checkpoint</i> to store the results.
 
