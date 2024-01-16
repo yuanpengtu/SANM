@@ -1,0 +1,9 @@
+torch
+torchvision
+numpy
+sklearn
+torchnet
+pillow
+umap-learn
+pandas
+matplotlib
