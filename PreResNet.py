@@ -116,7 +116,7 @@ class PreActBottleneck(nn.Module):
         out += shortcut
         return out
 
-
+from resnetc2d import Decoder
 class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
         super(ResNet, self).__init__()
@@ -129,7 +129,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.linear = nn.Linear(512*block.expansion, num_classes)
-
+        self.recon_module = Decoder()
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
         layers = []
@@ -138,7 +138,7 @@ class ResNet(nn.Module):
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layers)
 
-    def forward(self, x,return_map=False, lin=0, lout=5):
+    def forward(self, x,return_map=False, recon=False, lin=0, lout=5):
         out = x
         if lin < 1 and lout > -1:
             out = self.conv1(out)
@@ -158,6 +158,9 @@ class ResNet(nn.Module):
             out = out.view(out.size(0), -1)
             feat = out
             out = self.linear(out)
+        if recon:
+            recon_img = self.recon_module(featmap)
+            return recon_img
         return featmap, feat, out
 
 
