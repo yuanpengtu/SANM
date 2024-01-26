@@ -56,7 +56,7 @@ def attention_erase_map(images, outputs, gmmweight, target_mask):
     for i in range(img.size(0)):
         for attempt in range(1000000000):
             area = img.size()[2] * img.size()[3]
-            target_area_ratio =  random.uniform(sl, sh) + 0.02 * (1-gmmweight[i])
+            target_area_ratio =  random.uniform(sl, sh) + 0.03 * (1-gmmweight[i])
             target_area = target_area_ratio*area
             maxindex = torch.argmax(target_mask[i])
             flagmask = torch.zeros(target_mask[i].shape)
@@ -217,7 +217,7 @@ def train(epoch,net,net2,optimizer,labeled_trainloader,unlabeled_trainloader):
         prior = prior.cuda()        
         pred_mean = torch.softmax(logits, dim=1).mean(0)
         penalty = torch.sum(prior*torch.log(prior/pred_mean))
-
+        print(Lx, Lu, penalty, Lrecon)
         loss = Lx + lamb * Lu  + penalty + Lrecon*0.02
         optimizer.zero_grad()
         loss.backward()
@@ -225,7 +225,6 @@ def train(epoch,net,net2,optimizer,labeled_trainloader,unlabeled_trainloader):
 
 def warmup(epoch,net,optimizer,dataloader):
     net.train()
-    num_iter = (len(dataloader.dataset)//dataloader.batch_size)+1
     for batch_idx, (inputs, labels, path) in enumerate(dataloader):      
         inputs, labels = inputs.cuda(), labels.cuda() 
         optimizer.zero_grad()
@@ -237,6 +236,7 @@ def warmup(epoch,net,optimizer,dataloader):
         elif args.noise_mode=='sym':   
             L = loss
         L.backward()  
+        torch.nn.utils.clip_grad_norm_(net.parameters(), 1.)
         optimizer.step() 
 
 def test(epoch,net1,net2, maxacc):
@@ -307,14 +307,17 @@ class NegEntropy(object):
         return torch.mean(torch.sum(probs.log()*probs, dim=1))
 
 
-def create_model_selfsup(net='resnet18', dataset='cifar10', num_classes=10, device='cuda:0', drop=0):
-    chekpoint = torch.load('./pretrained/ckpt_{}_{}.pth'.format(dataset, net))
-    sd = {}
-    for ke in chekpoint['model']:
-        nk = ke.replace('module.', '')
-        sd[nk] = chekpoint['model'][ke]
-    model = SupCEResNet(net, num_classes=num_classes)
-    model.load_state_dict(sd, strict=False)
+def create_model_selfsup(net='resnet18', dataset='cifar10', num_classes=10, device='cuda:0', drop=0, DivideMix=False):
+    if DivideMix:
+        model = ResNet18(num_classes=num_classes)
+    else:
+        chekpoint = torch.load('./pretrained/ckpt_{}_{}.pth'.format(dataset, net))
+        sd = {}
+        for ke in chekpoint['model']:
+            nk = ke.replace('module.', '')
+            sd[nk] = chekpoint['model'][ke]
+        model = SupCEResNet(net, num_classes=num_classes)
+        model.load_state_dict(sd, strict=False)
     model = model.to(device)
     return model
 
