@@ -217,7 +217,6 @@ def train(epoch,net,net2,optimizer,labeled_trainloader,unlabeled_trainloader):
         prior = prior.cuda()        
         pred_mean = torch.softmax(logits, dim=1).mean(0)
         penalty = torch.sum(prior*torch.log(prior/pred_mean))
-        print(Lx, Lu, penalty, Lrecon)
         loss = Lx + lamb * Lu  + penalty + Lrecon*0.02
         optimizer.zero_grad()
         loss.backward()
