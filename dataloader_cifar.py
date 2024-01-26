@@ -184,7 +184,7 @@ class cifar_dataset(Dataset):
         elif self.mode=='all':
             img, target = self.train_data[index], self.noise_label[index]
             img = Image.fromarray(img)
-            img = self.transform_aug(img)#(img)            
+            img = self.transform(img)#(img)            
             return img, target, index        
         elif self.mode=='test':
             img, target = self.test_data[index], self.test_label[index]
